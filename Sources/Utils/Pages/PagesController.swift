@@ -137,7 +137,7 @@ class PagesController: UIViewController {
     scrollView.setContentOffset(point, animated: animated)
   }
 
-  fileprivate func scrollToAndSelect(index: Int, animated: Bool) {
+  open func scrollToAndSelect(index: Int, animated: Bool) {
     scrollTo(index: index, animated: animated)
     pageIndicator.select(index: index, animated: animated)
   }

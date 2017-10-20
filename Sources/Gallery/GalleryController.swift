@@ -40,7 +40,6 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
     }
   }
 
-
   open override var prefersStatusBarHidden : Bool {
     return true
   }
@@ -133,6 +132,31 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
       }
     }
   }
+
+  open func select(tab: Config.GalleryTab, animated:Bool) {
+    let pages:PagesController = self.childViewControllers.filter { controller in
+      controller.isKind(of: PagesController.self)
+    }.first as! PagesController
+
+    var selectIndex:Int = 0
+
+    if tab == .cameraTab {
+      selectIndex = pages.controllers.index { (controller: UIViewController) in
+        controller.isKind(of: CameraController.self)
+      }!
+    } else if tab == .videoTab {
+      selectIndex = pages.controllers.index { (controller: UIViewController) in
+        controller.isKind(of: VideosController.self)
+      }!
+    } else if tab == .imageTab {
+      selectIndex = pages.controllers.index { (controller: UIViewController) in
+        controller.isKind(of: ImagesController.self)
+      }!
+    }
+
+    pages.scrollToAndSelect(index: selectIndex, animated: animated)
+  }
+
 
   // MARK: - PermissionControllerDelegate
 
