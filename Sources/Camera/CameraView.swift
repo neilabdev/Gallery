@@ -17,7 +17,6 @@ class CameraView: UIView, UIGestureRecognizerDelegate {
   lazy var doneButton: UIButton = self.makeDoneButton()
   lazy var focusImageView: UIImageView = self.makeFocusImageView()
   lazy var tapGR: UITapGestureRecognizer = self.makeTapGR()
-  lazy var pinchGR: UIPinchGestureRecognizer = self.makePinchGR()
   lazy var rotateOverlayView: UIView = self.makeRotateOverlayView()
   lazy var shutterOverlayView: UIView = self.makeShutterOverlayView()
   lazy var blurView: UIVisualEffectView = self.makeBlurView()
@@ -43,7 +42,6 @@ class CameraView: UIView, UIGestureRecognizerDelegate {
 
   func setup() {
     addGestureRecognizer(tapGR)
-    addGestureRecognizer(pinchGR)
 
     [closeButton, flashButton, rotateButton, bottomContainer].forEach {
       addSubview($0)
@@ -239,13 +237,6 @@ class CameraView: UIView, UIGestureRecognizerDelegate {
     gr.delegate = self
 
     return gr
-  }
-
-  func makePinchGR() -> UIPinchGestureRecognizer {
-    let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(viewPinched(_:)))
-    // viewPinch.isUserInteractionEnabled = true
-    //s.addGestureRecognizer(pinchGesture)
-    return pinchGesture
   }
 
   func makeRotateOverlayView() -> UIView {
