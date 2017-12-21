@@ -8,7 +8,7 @@ class GalleryBundle {
 
     if let url = bundleURL, let resourceBundle = Bundle(url: url) { // NOTE: Should always succeed
       return UIImage(named: named, in: resourceBundle, compatibleWith: nil)
-    } else {
+    } else { // initial method. Doesn't aways work when installed via Pod.
       let bundle = Bundle(for: Bundle.self)
       return UIImage(named: "Gallery.bundle/\(named)", in: bundle, compatibleWith: nil)
     }
