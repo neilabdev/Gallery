@@ -134,11 +134,6 @@ class CameraView: UIView, UIGestureRecognizerDelegate {
     })
   }
 
-  @objc func viewPinched(_ gr: UIPinchGestureRecognizer) {
-    print("viewPinched: \(gr)")
-
-  }
-
   // MARK: - Timer
 
   @objc func timerFired(_ timer: Timer) {
