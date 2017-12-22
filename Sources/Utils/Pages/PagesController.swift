@@ -92,21 +92,22 @@ class PagesController: UIViewController {
     }
     view.addSubview(scrollView)
     scrollView.addSubview(scrollViewContentView)
-
-    Constraint.on(
-      pageIndicator.leftAnchor.constraint(equalTo: pageIndicator.superview!.leftAnchor),
-      pageIndicator.rightAnchor.constraint(equalTo: pageIndicator.superview!.rightAnchor),
-      pageIndicator.heightAnchor.constraint(equalToConstant: 40)
-    )
-
-    if #available(iOS 11, *) {
-      Constraint.on(
-        pageIndicator.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+    if usePageIndicator {
+      Constraint.on( // NOTE: if usePageIndicator is false, it is not added to superview, causing pageIndicator.superview to be nil and crash
+              pageIndicator.leftAnchor.constraint(equalTo: pageIndicator.superview!.leftAnchor),
+              pageIndicator.rightAnchor.constraint(equalTo: pageIndicator.superview!.rightAnchor),
+              pageIndicator.heightAnchor.constraint(equalToConstant: 40)
       )
-    } else {
-      Constraint.on(
-        pageIndicator.bottomAnchor.constraint(equalTo: pageIndicator.superview!.bottomAnchor)
-      )
+
+      if #available(iOS 11, *) {
+        Constraint.on(
+                pageIndicator.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        )
+      } else {
+        Constraint.on(
+                pageIndicator.bottomAnchor.constraint(equalTo: pageIndicator.superview!.bottomAnchor)
+        )
+      }
     }
 
     scrollView.g_pinUpward()
