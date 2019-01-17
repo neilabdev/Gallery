@@ -134,7 +134,7 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
   }
 
   open func select(tab: Config.GalleryTab, animated:Bool) {
-    let pages:PagesController = self.childViewControllers.filter { controller in
+    let pages:PagesController = self.children.filter { controller in
       controller.isKind(of: PagesController.self)
     }.first as! PagesController
 
