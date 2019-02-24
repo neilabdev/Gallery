@@ -91,6 +91,10 @@ class VideosController: UIViewController {
   // MARK: - View
 
   func refreshView() {
+    let hasVideos = !cart.videos.isEmpty
+    gridView.bottomView.g_fade(visible: hasVideos)
+    gridView.collectionView.g_updateBottomInset(hasVideos ? gridView.bottomView.frame.size.height : 0)
+    /*
     if let selectedItem = cart.video {
       videoBox.imageView.g_loadImage(selectedItem.asset)
     } else {
@@ -103,7 +107,7 @@ class VideosController: UIViewController {
 
     cart.video?.fetchDuration { [weak self] duration in
       self?.infoLabel.isHidden = duration <= Config.VideoEditor.maximumDuration
-    }
+    } */
   }
 
   // MARK: - Controls
@@ -175,7 +179,7 @@ extension VideosController: VideoBoxDelegate {
 extension VideosController: CartDelegate {
 
   func cart(_ cart: Cart, didAdd image: Image, newlyTaken: Bool) {
-    stackView.reload(cart.images, added: true)
+    stackView.reload(cart.videos, added: true)
     refreshView()
 
     //if newlyTaken {
@@ -184,12 +188,12 @@ extension VideosController: CartDelegate {
   }
 
   func cart(_ cart: Cart, didRemove image: Image) {
-    stackView.reload(cart.images)
+    stackView.reload(cart.videos)
     refreshView()
   }
 
   func cartDidReload(_ cart: Cart) {
-    stackView.reload(cart.images)
+    stackView.reload(cart.videos)
     refreshView()
     //refreshSelectedAlbum()
   }
@@ -231,9 +235,13 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
 
     if cart.contains(item) {
       cart.remove(item)
-    } else  if let video = item as? Video, Config.Camera.videoLimit == 0 ||
-              Config.Camera.videoLimit > cart.videos.count{
+    } else  if let video = item as? Video {
+
+      let check =  Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > cart.videos.count
+
         cart.add(item)
+    } else {
+
     }
 
     /*
