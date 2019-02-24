@@ -1,12 +1,17 @@
 import UIKit
 import AVFoundation
 
-public protocol GalleryControllerDelegate: class {
+@objc public   protocol GalleryControllerDelegate: AnyObject {
 
   func galleryController(_ controller: GalleryController, didSelectImages images: [Image])
+  @objc optional func galleryController(_ controller: GalleryController, didSelectVideos videos: [Video])
   func galleryController(_ controller: GalleryController, didSelectVideo video: Video)
   func galleryController(_ controller: GalleryController, requestLightbox images: [Image])
   func galleryControllerDidCancel(_ controller: GalleryController)
+}
+
+extension  GalleryControllerDelegate {
+  func galleryController(_ controller: GalleryController, didSelectVideos videos: [Video]) {} //optional
 }
 
 open class GalleryController: UIViewController, PermissionControllerDelegate {
@@ -121,8 +126,14 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
     }
 
     EventHub.shared.doneWithVideos = { [weak self] in
-      if let strongSelf = self, let video = strongSelf.cart.video {
-        strongSelf.delegate?.galleryController(strongSelf, didSelectVideo: video)
+      if let strongSelf = self{
+        let videos = strongSelf.cart.videos
+        if Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > 1 || videos.count > 1 {
+          strongSelf.delegate?.galleryController(strongSelf, didSelectVideos: videos)
+        } else  {
+          strongSelf.delegate?.galleryController(strongSelf, didSelectVideo: videos.first!)
+        }
+
       }
     }
 

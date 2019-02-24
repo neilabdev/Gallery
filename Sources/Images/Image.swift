@@ -1,15 +1,20 @@
 import UIKit
 import Photos
 
+enum GalleryType {
+  case image, video;
+}
+
 /// Wrap a PHAsset
-public class Image: Equatable {
+public class Image: NSObject { // }, Equatable {
 
   public let asset: PHAsset
-
+    internal var type:GalleryType
   // MARK: - Initialization
   
   init(asset: PHAsset) {
     self.asset = asset
+    self.type = .image
   }
 }
 
@@ -22,6 +27,10 @@ extension Image {
   /// - Parameter size: The target size
   /// - Returns: The resolved UIImage, otherwise nil
   public func resolve(completion: @escaping (UIImage?) -> Void) {
+    guard self.type == .image else {
+      //return completion(nil);
+      fatalError("expected execution on image type")
+    }
     let options = PHImageRequestOptions()
     options.isNetworkAccessAllowed = true
     options.deliveryMode = .highQualityFormat

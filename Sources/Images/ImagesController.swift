@@ -221,10 +221,14 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
 
-    if cart.images.contains(item) {
+    if cart.contains(item) {
       cart.remove(item)
     } else {
-      if Config.Camera.imageLimit == 0 || Config.Camera.imageLimit > cart.images.count{
+      if let video = item as? Video, Config.Camera.videoLimit == 0 ||
+              Config.Camera.videoLimit > cart.videos.count{
+        cart.add(item)
+      } else if let image = item as? Image, Config.Camera.imageLimit == 0 ||
+              Config.Camera.imageLimit > cart.images.count{
         cart.add(item)
       }
     }
@@ -243,7 +247,7 @@ extension ImagesController: UICollectionViewDataSource, UICollectionViewDelegate
   func configureFrameView(_ cell: ImageCell, indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
 
-    if let index = cart.images.index(of: item) {
+    if let index = cart.index(of: item) {
       cell.frameView.g_quickFade()
       cell.frameView.label.text = "\(index + 1)"
     } else {

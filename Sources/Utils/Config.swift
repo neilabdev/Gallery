@@ -51,6 +51,8 @@ public struct Config {
     }
     
     public static var imageLimit: Int = 0
+
+    public static var videoLimit: Int = 1 // default behavior is 1
     
   }
 

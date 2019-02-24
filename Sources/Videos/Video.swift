@@ -2,17 +2,17 @@ import UIKit
 import Photos
 
 /// Wrap a PHAsset for video
-public class Video: Equatable {
+public class Video: Image {//}, Equatable {
 
-  public let asset: PHAsset
+  //public let asset: PHAsset
 
   var durationRequestID: Int = 0
   var duration: Double = 0
 
   // MARK: - Initialization
-
-  init(asset: PHAsset) {
-    self.asset = asset
+  override init(asset: PHAsset) {
+    super.init(asset: asset)
+    self.type = .video
   }
 
   /// Fetch video duration asynchronously
@@ -94,10 +94,4 @@ public class Video: Equatable {
 
     return options
   }
-}
-
-// MARK: - Equatable
-
-public func ==(lhs: Video, rhs: Video) -> Bool {
-  return lhs.asset == rhs.asset
 }

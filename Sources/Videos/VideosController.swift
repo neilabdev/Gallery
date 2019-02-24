@@ -7,6 +7,7 @@ class VideosController: UIViewController {
   lazy var gridView: GridView = self.makeGridView()
   lazy var videoBox: VideoBox = self.makeVideoBox()
   lazy var infoLabel: UILabel = self.makeInfoLabel()
+  lazy var stackView: StackView = self.makeStackView()
 
   var items: [Video] = []
   let library = VideosLibrary()
@@ -18,6 +19,7 @@ class VideosController: UIViewController {
   public required init(cart: Cart) {
     self.cart = cart
     super.init(nibName: nil, bundle: nil)
+    cart.delegates.add(self)
   }
 
   public required init?(coder aDecoder: NSCoder) {
@@ -43,6 +45,8 @@ class VideosController: UIViewController {
       gridView.bottomView.addSubview($0)
     }
 
+    gridView.bottomView.addSubview(stackView)
+
     gridView.g_pinEdges()
 
     videoBox.g_pin(size: CGSize(width: 44, height: 44))
@@ -53,8 +57,14 @@ class VideosController: UIViewController {
     infoLabel.g_pin(on: .left, view: videoBox, on: .right, constant: 11)
     infoLabel.g_pin(on: .right, constant: -50)
 
+
+    stackView.g_pin(on: .centerY, constant: -4)
+    stackView.g_pin(on: .left, constant: 38)
+    stackView.g_pin(size: CGSize(width: 56, height: 56))
+
     gridView.closeButton.addTarget(self, action: #selector(closeButtonTouched(_:)), for: .touchUpInside)
     gridView.doneButton.addTarget(self, action: #selector(doneButtonTouched(_:)), for: .touchUpInside)
+    stackView.addTarget(self, action: #selector(stackViewTouched(_:)), for: .touchUpInside)
 
     gridView.collectionView.dataSource = self
     gridView.collectionView.delegate = self
@@ -72,6 +82,10 @@ class VideosController: UIViewController {
 
   @objc func doneButtonTouched(_ button: UIButton) {
     EventHub.shared.doneWithVideos?()
+  }
+
+  @objc func stackViewTouched(_ stackView: StackView) {
+    EventHub.shared.stackViewTouched?()
   }
 
   // MARK: - View
@@ -117,6 +131,12 @@ class VideosController: UIViewController {
 
     return label
   }
+
+  func makeStackView() -> StackView {
+    let view = StackView()
+
+    return view
+  }
 }
 
 extension VideosController: PageAware {
@@ -152,6 +172,30 @@ extension VideosController: VideoBoxDelegate {
   }
 }
 
+extension VideosController: CartDelegate {
+
+  func cart(_ cart: Cart, didAdd image: Image, newlyTaken: Bool) {
+    stackView.reload(cart.images, added: true)
+    refreshView()
+
+    //if newlyTaken {
+    //  refreshSelectedAlbum()
+    //}
+  }
+
+  func cart(_ cart: Cart, didRemove image: Image) {
+    stackView.reload(cart.images)
+    refreshView()
+  }
+
+  func cartDidReload(_ cart: Cart) {
+    stackView.reload(cart.images)
+    refreshView()
+    //refreshSelectedAlbum()
+  }
+}
+
+
 extension VideosController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
   // MARK: - UICollectionViewDataSource
@@ -185,13 +229,22 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
 
+    if cart.contains(item) {
+      cart.remove(item)
+    } else  if let video = item as? Video, Config.Camera.videoLimit == 0 ||
+              Config.Camera.videoLimit > cart.videos.count{
+        cart.add(item)
+    }
+
+    /*
+
     if let selectedItem = cart.video , selectedItem == item {
       cart.video = nil
     } else {
       cart.video = item
     }
 
-    refreshView()
+    refreshView()*/
     configureFrameViews()
   }
 
@@ -206,10 +259,17 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
   func configureFrameView(_ cell: VideoCell, indexPath: IndexPath) {
     let item = items[(indexPath as NSIndexPath).item]
 
+    if let index = cart.index(of: item) {
+      cell.frameView.g_quickFade()
+      cell.frameView.label.text = "\(index + 1)"
+    } else {
+      cell.frameView.alpha = 0
+    }
+/*
     if let selectedItem = cart.video , selectedItem == item {
       cell.frameView.g_quickFade()
     } else {
       cell.frameView.alpha = 0
-    }
+    } */
   }
 }
