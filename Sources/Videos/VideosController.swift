@@ -85,7 +85,26 @@ class VideosController: UIViewController {
   }
 
   @objc func stackViewTouched(_ stackView: StackView) {
-    EventHub.shared.stackViewTouched?()
+
+    if self.supportsMultipleVideos {
+      EventHub.shared.videoStackViewTouched?()
+    } else if let video = cart.videos.first {
+      video.fetchPlayerItem { item in
+        guard let item = item else {
+          return
+        }
+
+        DispatchQueue.main.async {
+          let controller = AVPlayerViewController()
+          let player = AVPlayer(playerItem: item)
+          controller.player = player
+
+          self.present(controller, animated: true) {
+            player.play()
+          }
+        }
+      }//fetchPlayer
+    }
   }
 
   // MARK: - View
@@ -121,7 +140,7 @@ class VideosController: UIViewController {
 
   func makeVideoBox() -> VideoBox {
     let videoBox = VideoBox()
-    videoBox.delegate = self
+  //  videoBox.delegate = self
 
     return videoBox
   }
@@ -143,6 +162,22 @@ class VideosController: UIViewController {
   }
 }
 
+
+extension VideosController {
+  var supportsMultipleVideos :Bool {
+    get {
+      let v = Config.Camera.videoLimit == 0 ||  Config.Camera.videoLimit > 1
+      return v
+    }
+  }
+
+  var supportsAdditionalVideo: Bool {
+    get {
+      return Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > cart.videos.count
+    }
+  }
+}
+
 extension VideosController: PageAware {
 
   func pageDidShow() {
@@ -157,24 +192,6 @@ extension VideosController: PageAware {
   }
 }
 
-extension VideosController: VideoBoxDelegate {
-
-  func videoBoxDidTap(_ videoBox: VideoBox) {
-    cart.video?.fetchPlayerItem { item in
-      guard let item = item else { return }
-
-      DispatchQueue.main.async {
-        let controller = AVPlayerViewController()
-        let player = AVPlayer(playerItem: item)
-        controller.player = player
-
-        self.present(controller, animated: true) {
-          player.play()
-        }
-      }
-    }
-  }
-}
 
 extension VideosController: CartDelegate {
 
@@ -210,8 +227,8 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: VideoCell.self), for: indexPath)
-      as! VideoCell
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: VideoCell.self),
+            for: indexPath) as! VideoCell
     let item = items[(indexPath as NSIndexPath).item]
 
     cell.configure(item)
@@ -225,18 +242,7 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
     return cell
   }
 
-  var supportsMultipleVideos :Bool {
-    get {
-      let v = Config.Camera.videoLimit == 0 ||  Config.Camera.videoLimit > 1 //Config.Camera.videoLimit > cart.videos.count
-      return v
-    }
-  }
 
-  var supportsAdditionalVideo: Bool {
-    get {
-      return Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > cart.videos.count
-    }
-  }
 
   // MARK: - UICollectionViewDelegateFlowLayout
 
@@ -263,15 +269,6 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
       }
     }
 
-    /*
-
-    if let selectedItem = cart.video , selectedItem == item {
-      cart.video = nil
-    } else {
-      cart.video = item
-    }
-
-    refreshView()*/
     configureFrameViews()
   }
 
@@ -292,11 +289,5 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
     } else {
       cell.frameView.alpha = 0
     }
-/*
-    if let selectedItem = cart.video , selectedItem == item {
-      cell.frameView.g_quickFade()
-    } else {
-      cell.frameView.alpha = 0
-    } */
   }
 }

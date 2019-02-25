@@ -12,7 +12,6 @@ public class Cart {
 
   public var images: [Image] = []
   public var videos: [Video] = []
-  public var video: Video?
   var delegates: NSHashTable<AnyObject> = NSHashTable.weakObjects()
 
   // MARK: - Initialization
