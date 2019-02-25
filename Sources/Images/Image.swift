@@ -1,7 +1,7 @@
 import UIKit
 import Photos
 
-enum GalleryType {
+public enum GalleryType {
   case image, video;
 }
 
@@ -9,8 +9,10 @@ enum GalleryType {
 public class Image: NSObject { // }, Equatable {
 
   public let asset: PHAsset
-    internal var type:GalleryType
+    internal(set) public var type:GalleryType
   // MARK: - Initialization
+
+
   
   init(asset: PHAsset) {
     self.asset = asset

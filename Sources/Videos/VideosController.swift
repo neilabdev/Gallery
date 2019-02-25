@@ -5,7 +5,6 @@ import AVKit
 class VideosController: UIViewController {
 
   lazy var gridView: GridView = self.makeGridView()
-  lazy var videoBox: VideoBox = self.makeVideoBox()
   lazy var infoLabel: UILabel = self.makeInfoLabel()
   lazy var stackView: StackView = self.makeStackView()
 
@@ -41,26 +40,20 @@ class VideosController: UIViewController {
 
     view.addSubview(gridView)
 
-    [videoBox, infoLabel].forEach {
+    [ infoLabel].forEach {
       gridView.bottomView.addSubview($0)
     }
 
     gridView.bottomView.addSubview(stackView)
-
     gridView.g_pinEdges()
-
-    videoBox.g_pin(size: CGSize(width: 44, height: 44))
-    videoBox.g_pin(on: .centerY)
-    videoBox.g_pin(on: .left, constant: 38)
-
-    infoLabel.g_pin(on: .centerY)
-    infoLabel.g_pin(on: .left, view: videoBox, on: .right, constant: 11)
-    infoLabel.g_pin(on: .right, constant: -50)
-
 
     stackView.g_pin(on: .centerY, constant: -4)
     stackView.g_pin(on: .left, constant: 38)
     stackView.g_pin(size: CGSize(width: 56, height: 56))
+
+    infoLabel.g_pin(on: .centerY)
+    infoLabel.g_pin(on: .left, view: stackView, on: .right, constant: 11)
+    infoLabel.g_pin(on: .right, constant: -50)
 
     gridView.closeButton.addTarget(self, action: #selector(closeButtonTouched(_:)), for: .touchUpInside)
     gridView.doneButton.addTarget(self, action: #selector(doneButtonTouched(_:)), for: .touchUpInside)
@@ -138,12 +131,7 @@ class VideosController: UIViewController {
     return view
   }
 
-  func makeVideoBox() -> VideoBox {
-    let videoBox = VideoBox()
-  //  videoBox.delegate = self
 
-    return videoBox
-  }
 
   func makeInfoLabel() -> UILabel {
     let label = UILabel()
