@@ -215,10 +215,27 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
     let item = items[(indexPath as NSIndexPath).item]
 
     cell.configure(item)
-    cell.frameView.label.isHidden = true
+
+    if self.supportsMultipleVideos == false {
+      cell.frameView.label.isHidden = true
+    }
+
     configureFrameView(cell, indexPath: indexPath)
 
     return cell
+  }
+
+  var supportsMultipleVideos :Bool {
+    get {
+      let v = Config.Camera.videoLimit == 0 ||  Config.Camera.videoLimit > 1 //Config.Camera.videoLimit > cart.videos.count
+      return v
+    }
+  }
+
+  var supportsAdditionalVideo: Bool {
+    get {
+      return Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > cart.videos.count
+    }
   }
 
   // MARK: - UICollectionViewDelegateFlowLayout
@@ -235,13 +252,15 @@ extension VideosController: UICollectionViewDataSource, UICollectionViewDelegate
 
     if cart.contains(item) {
       cart.remove(item)
-    } else  if let video = item as? Video {
+    } else  if let video = item as? Video  {
 
-      let check =  Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > cart.videos.count
+      if self.supportsMultipleVideos == false {
+        cart.videos.removeAll()
+      }
 
+      if supportsAdditionalVideo == true  {
         cart.add(item)
-    } else {
-
+      }
     }
 
     /*
