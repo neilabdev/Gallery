@@ -2,16 +2,19 @@ import UIKit
 import AVFoundation
 
 @objc public   protocol GalleryControllerDelegate: AnyObject {
-
-  func galleryController(_ controller: GalleryController, didSelectImages images: [Image])
+  @objc optional func galleryController(_ controller: GalleryController, didSelectItems items: [Image])
+  @objc optional func galleryController(_ controller: GalleryController, didSelectImages images: [Image])
   @objc optional func galleryController(_ controller: GalleryController, didSelectVideos videos: [Video])
-  func galleryController(_ controller: GalleryController, didSelectVideo video: Video)
+  @objc optional func galleryController(_ controller: GalleryController, didSelectVideo video: Video)
   func galleryController(_ controller: GalleryController, requestLightbox images: [Image])
   func galleryControllerDidCancel(_ controller: GalleryController)
 }
 
 extension  GalleryControllerDelegate {
   func galleryController(_ controller: GalleryController, didSelectVideos videos: [Video]) {} //optional
+  func galleryController(_ controller: GalleryController, didSelectImages images: [Image]) { }
+  func galleryController(_ controller: GalleryController, didSelectItems items: [Image]) {}
+  func galleryController(_ controller: GalleryController, didSelectVideo video: Video) {}
 }
 
 open class GalleryController: UIViewController, PermissionControllerDelegate {
@@ -121,7 +124,9 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
 
     EventHub.shared.doneWithImages = { [weak self] in
       if let strongSelf = self {
-        strongSelf.delegate?.galleryController(strongSelf, didSelectImages: strongSelf.cart.images)
+        var combinedItems:[Image] = [Image]()
+        strongSelf.delegate?.galleryController?(strongSelf, didSelectImages: strongSelf.cart.images)
+        strongSelf.delegate?.galleryController?(strongSelf, didSelectItems: strongSelf.cart.items)
       }
     }
 
@@ -129,21 +134,23 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
       if let strongSelf = self{
         let videos = strongSelf.cart.videos
         if Config.Camera.videoLimit == 0 || Config.Camera.videoLimit > 1 || videos.count > 1 {
-          strongSelf.delegate?.galleryController(strongSelf, didSelectVideos: videos)
+          strongSelf.delegate?.galleryController?(strongSelf, didSelectVideos: videos)
+          strongSelf.delegate?.galleryController?(strongSelf, didSelectItems: strongSelf.cart.items)
         } else  {
-          strongSelf.delegate?.galleryController(strongSelf, didSelectVideo: videos.first!)
+          strongSelf.delegate?.galleryController?(strongSelf, didSelectVideo: videos.first!)
+          strongSelf.delegate?.galleryController?(strongSelf, didSelectItems: strongSelf.cart.items)
         }
       }
     }//
 
     EventHub.shared.videoStackViewTouched = { [weak self] in
       if let strongSelf = self {
-        strongSelf.delegate?.galleryController(strongSelf, requestLightbox: strongSelf.cart.videos)
+        strongSelf.delegate?.galleryController?(strongSelf, requestLightbox: strongSelf.cart.videos)
       }
     }
     EventHub.shared.stackViewTouched = { [weak self] in
       if let strongSelf = self {
-        strongSelf.delegate?.galleryController(strongSelf, requestLightbox: strongSelf.cart.images)
+        strongSelf.delegate?.galleryController?(strongSelf, requestLightbox: strongSelf.cart.images)
       }
     }
   }

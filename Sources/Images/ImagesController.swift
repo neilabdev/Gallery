@@ -13,7 +13,7 @@ class ImagesController: UIViewController {
   let once = Once()
   let cart: Cart
 
-  // MARK: - Init
+  // MARK: - Initc
 
   public required init(cart: Cart) {
     self.cart = cart

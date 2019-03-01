@@ -14,6 +14,15 @@ public class Cart {
   public var videos: [Video] = []
   var delegates: NSHashTable<AnyObject> = NSHashTable.weakObjects()
 
+  public var items: [Image]  {
+    get {
+      var combined:[Image] = [Image]()
+      combined.append(contentsOf: images)
+      combined.append(contentsOf: videos)
+      return combined
+    }
+  }
+
   // MARK: - Initialization
 
   init() {
