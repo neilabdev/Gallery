@@ -145,12 +145,12 @@ open class GalleryController: UIViewController, PermissionControllerDelegate {
 
     EventHub.shared.videoStackViewTouched = { [weak self] in
       if let strongSelf = self {
-        strongSelf.delegate?.galleryController?(strongSelf, requestLightbox: strongSelf.cart.videos)
+        strongSelf.delegate?.galleryController(strongSelf, requestLightbox: strongSelf.cart.videos)
       }
     }
     EventHub.shared.stackViewTouched = { [weak self] in
       if let strongSelf = self {
-        strongSelf.delegate?.galleryController?(strongSelf, requestLightbox: strongSelf.cart.images)
+        strongSelf.delegate?.galleryController(strongSelf, requestLightbox: strongSelf.cart.images)
       }
     }
   }
