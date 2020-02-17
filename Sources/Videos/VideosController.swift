@@ -135,10 +135,12 @@ class VideosController: UIViewController {
 
   func makeInfoLabel() -> UILabel {
     let label = UILabel()
+    let maxSeconds = Int(Config.VideoEditor.maximumDuration)
+    let displayInterval = maxSeconds >= 60 ? (maxSeconds / 60) : maxSeconds;
     label.textColor = UIColor.white
     label.font = Config.Font.Text.regular.withSize(12)
     label.text = String(format: "Gallery.Videos.MaxiumDuration".g_localize(fallback: "FIRST %d SECONDS"),
-                        (Int(Config.VideoEditor.maximumDuration)))
+                        (Int(displayInterval)))
 
     return label
   }
